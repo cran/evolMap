@@ -10,10 +10,11 @@ Object of class \code{evolMap}.
 
 \usage{
 add_markers(map, data, latitude = NULL, longitude = NULL, name = NULL,
-  label = NULL, image = NULL, color = NULL, shape = NULL, text = NULL,
-  info = NULL, infoFrame = c("right","left"),
-  start = NULL, end = NULL, period = NULL,
-  markerCluster = FALSE, roundedIcons = TRUE, jitteredPoints = 0)
+  label = NULL, image = NULL, size = NULL, color = NULL, shape = NULL,
+  text = NULL, info = NULL, infoFrame = c("right","left"),
+  rightFrameWidth = NULL, start = NULL, end = NULL, period = NULL,
+  markerCluster = FALSE, roundedIcons = TRUE, jitteredPoints = 0,
+  coords = FALSE)
 }
 \arguments{
 \item{map}{an object of class \code{evolMap}.}
@@ -23,17 +24,20 @@ add_markers(map, data, latitude = NULL, longitude = NULL, name = NULL,
 \item{name}{name of the column with names in the marker data frame.}
 \item{label}{name of the column with labels in the marker data frame.}
 \item{image}{name of the column with the path to marker image files in the marker data frame.}
+\item{size}{name of the column with size in the nodes data frame.}
 \item{color}{name of the column with color variable in the marker data frame.}
 \item{shape}{name of the column with shape variable in the marker data frame.}
 \item{text}{name of the column with texts in the marker data frame. This information will be shown as a popup.}
 \item{info}{name of the column with information to display in a panel in the marker data frame.}
-\item{infoFrame}{Panel (right or left) where the information is to be displayed The left panel is only available if a description is provided with \code{add_description}.}
+\item{infoFrame}{Panel (right or left) where the information is to be displayed. The left panel is only available if a description is provided with \code{add_description}.}
+\item{rightFrameWidth}{a percentage indicating the width for the right information panel.}
 \item{start}{name of the column with the start time of a period in the marker data frame.}
 \item{end}{name of the column with the end time of a period in the marker data frame.}
 \item{period}{name of the column with the period name in the marker data frame.} 
 \item{markerCluster}{enable joining of nearby markers when zooming out.}
 \item{roundedIcons}{display markers with rounded borders.}
 \item{jitteredPoints}{add an amount of noise to markers to avoid overlapping.}
+\item{coords}{should coordinates (latitude and longitude) must be shown in the table and filters? (FALSE by default)}
 }
 \author{
 Modesto Escobar \email{modesto@usal.es}, Department of Sociology and Communication, University of Salamanca, Carlos Prieto \email{cprietos@usal.es}, and  David Barrios \email{metal@usal.es}, Bioinformatics Service, University of Salamanca.

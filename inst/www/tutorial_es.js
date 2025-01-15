@@ -7,8 +7,8 @@ var tutorial_texts = {
   collectionofelements: 'Esto es un mapa que representa algunos elementos',
   eachfigure: 'Cada <span class="highlight">círculo</span> representa un elemento.',
 
-  hoveringthemouse: '<span class="highlight">Al pasar el ratón</span> por encima de cualquier elemento se abrirá un recuadro con información básica.',
-  whenclicking: 'Y, al <span class="highlight">seleccionar</span> el elemento, se abrirá su página completa de Wikipedia en la derecha de la pantalla.',
+  hoveringthemouse: 'Al <span class="highlight">hacer click</span> en cualquier elemento se abrirá un recuadro con información básica.',
+  whenclicking: 'Al <span class="highlight">hacer click</span> en el elemento, se abrirá una página de información en un panel.',
   
   timecontrol: 'Puedes cambiar el tiempo que se muestra usando estos controles.',
 
@@ -25,10 +25,14 @@ var tutorial_texts = {
   toolsmenu4: '- Los filtros de la información visualizada.',
 
   figurescanalsobefiltered: 'También pueden <span class="highlight">filtrarse</span> los elementos seleccionando una o varias de las categorías de la leyenda para ver en el mapa solo los tipos que interesen.',
+  inthelegend: 'En la <span class="highlight">leyenda</span> pueden cambiarse colores y formas, así como el atributo a mostrar.',
 
   otherfunctions: 'Otras funciones posibles',
   statisticalgraphs: 'Gráficos estadísticos',
   informativetables: 'Tablas informativas',
+
+  inadditiontothispage: 'Además de esta página principal, hay otras páginas con distinta información.',
+  tonavigatefromonetoanother: 'Para <span class="highlight">navegar de una pestaña a otra</span>, utiliza el icono <img src="'+b64Icons.home+'"/> disponible en la parte superior izquierda de la pantalla.',
 
   hello: "¡Hola!",
   doyouneedhelp: "¿Necesitas ayuda?",

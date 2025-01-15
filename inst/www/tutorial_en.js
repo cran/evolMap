@@ -7,8 +7,8 @@ var tutorial_texts = {
   collectionofelements: 'This is a map that represents some elements.',
   eachfigure: 'Each <span class="highlight">circle</span> represents an element.',
 
-  hoveringthemouse: '<span class="highlight">Hovering the mouse</span> over any figure will open a box with basic information.',
-  whenclicking: 'And <span class="highlight">clicking</span> on the figure will open its Wikipedia page in the box on the right of the screen.',
+  hoveringthemouse: '<span class="highlight">Clicking</span> over any figure will open a box with basic information.',
+  whenclicking: '<span class="highlight">Clicking</span> on the figure will open an information page in a panel',
   
   timecontrol: 'You can change the time that is displayed using these controls.',
 
@@ -25,10 +25,14 @@ var tutorial_texts = {
   toolsmenu4: '- The filters of the displayed information.',
 
   figurescanalsobefiltered: 'You can also <span class="highlight">filter</span> items by selecting one or more of the categories in the legend to see only the types of interest on the map.',
+  inthelegend: 'In the <span class="highlight">legend</span> you can change colors and shapes, as well as the attribute to display.',
 
   otherfunctions: 'Other possible functions',
   statisticalgraphs: 'Statistical graphs',
   informativetables: 'Informative tables',
+
+  inadditiontothispage: 'In addition to this page, there are other pages with different information.',
+  tonavigatefromonetoanother: 'To <span class="highlight">navigate from one page to another</span>, return to the main menu clicking the <img src="'+b64Icons.home+'"/> icon available at the top left of the screen.',
 
   hello: "Hello!",
   doyouneedhelp: "Do you need help?",

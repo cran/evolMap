@@ -1,6 +1,8 @@
-create_map <- function(center = NULL, zoom = NULL, provider = "OpenStreetMap", note = NULL, defaultColor = "#2f7bee", controls = 1:4, language = c("en","es","ca")){
+create_map <- function(center = NULL, zoom = NULL, zoomStep = NULL, provider = "OpenStreetMap", main = NULL, note = NULL, mode = 1, defaultColor = "#2f7bee", controls = 1:4, language = c("en","es","ca")){
 
   object <- list(options=list())
+
+  object$options$mode <- as.numeric(mode)
 
   object$options$autoZoom <- TRUE
 
@@ -24,11 +26,21 @@ create_map <- function(center = NULL, zoom = NULL, provider = "OpenStreetMap", n
     object$options$zoom <- 3
   }
 
+  if(is.numeric(zoomStep) && zoomStep>0){
+    object$options$zoomstep <- zoomStep
+  }else{
+    if(!is.null(zoomStep)){
+      warning("zoomStep: must be a number greater than 0")
+    }
+    object$options$zoomstep <- 0.25
+  }
+
 providers <- list_providers()
 if(provider %in% providers){
   object$options$provider <- provider
 }else{
   object$options$provider <- providers[1]
+  warning("provider: Not supported provider")
 }
 
 if(isColor(defaultColor)){
@@ -40,6 +52,10 @@ if(isColor(defaultColor)){
 
   if(!is.null(controls)){
     object$options[["controls"]] <- as.numeric(controls)
+  }
+
+  if(!is.null(main)){
+    object$options[["main"]] <- as.character(main)
   }
 
   if(!is.null(note)){
@@ -61,9 +77,22 @@ setInfoFrame <- function(map,infoFrame){
   return(map)
 }
 
+setRightFrameWidth <- function(map,width){
+  map$options[["rightFrameWidth"]] <- NULL
+  if (!is.null(width)){
+    if(is.numeric(width) && width>=0 && width<=100){
+      map$options[["rightFrameWidth"]] <- width
+    }else{
+      warning("width: not a valid percentage.")
+    }
+  }
+  return(map)
+}
+
 add_markers <- function(map, data, latitude = NULL, longitude = NULL,
-  name = NULL, label = NULL, image = NULL, color = NULL, shape = NULL, text = NULL, info = NULL, infoFrame = c("right","left"),
-  start = NULL, end = NULL, period = NULL, markerCluster = FALSE, roundedIcons = TRUE, jitteredPoints = 0){
+  name = NULL, label = NULL, image = NULL, size = NULL, color = NULL, shape = NULL, text = NULL, info = NULL, infoFrame = c("right","left"), rightFrameWidth = NULL,
+  start = NULL, end = NULL, period = NULL, markerCluster = FALSE, roundedIcons = TRUE, jitteredPoints = 0,
+  coords = FALSE){
 
   if(!inherits(map, "evolMap")){
     stop("map: must be an object of class 'evolMap'")
@@ -108,6 +137,11 @@ if(!is.null(roundedIcons) && roundedIcons){
   map$options$roundedIcons <- TRUE
 }
 
+map$options$showCoords <- NULL
+if(!is.null(coords) && coords){
+  map$options$showCoords <- TRUE
+}
+
 map$options$markerLabel <- NULL
 if(!is.null(label)){
   data[[label]] <- as.character(data[[label]])
@@ -116,8 +150,22 @@ if(!is.null(label)){
 
 map$options$markerText <- NULL
 if(!is.null(text)){
-  data[[text]] <- as.character(data[[text]])
-  map$options$markerText <- text
+  if(map$options$mode==2){
+    text <- NULL
+    warning("text: this argument has no effects in mode 2")
+  }else{
+    data[[text]] <- as.character(data[[text]])
+    map$options$markerText <- text
+  }
+}
+
+map$options$markerSize <- NULL
+if(!is.null(size)){
+  if(is.numeric(data[[size]])){
+    map$options$markerSize <- size
+  }else{
+    warning("size: must be a numeric column from data")
+  }
 }
 
 map$options$image <- NULL
@@ -138,6 +186,7 @@ if(!is.null(info)){
 }
 
 map <- setInfoFrame(map,infoFrame)
+map <- setRightFrameWidth(map,rightFrameWidth)
 
 map$options$markerPeriod <- NULL
 if(!is.null(period)){
@@ -158,7 +207,7 @@ if(!is.null(period)){
   return(map)
 }
 
-add_links <- function(map, links, color = NULL, start = NULL, end = NULL, period = NULL){
+add_links <- function(map, links, color = NULL, start = NULL, end = NULL, period = NULL, curve = TRUE, arrows = FALSE){
 
   if(!inherits(map, "evolMap")){
     stop("map: must be an object of class 'evolMap'")
@@ -170,6 +219,16 @@ add_links <- function(map, links, color = NULL, start = NULL, end = NULL, period
 
   if(is.null(map$options$markerName)){
     stop("Markers must be provided with a 'name' in order to identify each link with his source and target")
+  }
+
+  map$options$linkCurve <- NULL
+  if(!is.null(curve) && curve){
+    map$options$linkCurve <- TRUE
+  }
+
+  map$options$linkArrows <- NULL
+  if(!is.null(arrows) && arrows){
+    map$options$linkArrows <- TRUE
   }
 
   source <- 1
@@ -198,7 +257,7 @@ add_links <- function(map, links, color = NULL, start = NULL, end = NULL, period
   return(map)
 }
 
-add_entities <- function(map, entities, attributes = NULL, name = NULL, label = NULL, color = NULL, text = NULL, info = NULL, infoFrame = c("right","left"), start = NULL, end = NULL, period = NULL, opacity = 0.2){
+add_entities <- function(map, entities, attributes = NULL, name = NULL, label = NULL, color = NULL, text = NULL, info = NULL, infoFrame = c("right","left"), rightFrameWidth = NULL, start = NULL, end = NULL, period = NULL, opacity = 0.2){
 
   if(!inherits(map, "evolMap")){
     stop("map: must be an object of class 'evolMap'")
@@ -270,6 +329,7 @@ add_entities <- function(map, entities, attributes = NULL, name = NULL, label = 
     }
 
     map <- setInfoFrame(map,infoFrame)
+    map <- setRightFrameWidth(map,rightFrameWidth)
 
     map$options$entityName <- name
 
@@ -307,7 +367,7 @@ add_entities <- function(map, entities, attributes = NULL, name = NULL, label = 
   return(map)
 }
 
-add_periods <- function(map, periods, name = NULL, start = NULL, end = NULL, latitude = NULL, longitude = NULL, zoom = NULL, description = NULL, duration = NULL, periodrep = TRUE){
+add_periods <- function(map, periods, name = NULL, start = NULL, end = NULL, latitude = NULL, longitude = NULL, zoom = NULL, description = NULL, popup = FALSE, duration = NULL, periodrep = TRUE){
   if(!inherits(map, "evolMap")){
     stop("map: must be an object of class 'evolMap'")
   }
@@ -352,6 +412,11 @@ add_periods <- function(map, periods, name = NULL, start = NULL, end = NULL, lat
   if(!is.null(description)){
     periods[,description] <- as.character(periods[,description])
     map$options$periodDescription <- description
+  }
+
+  map$options$periodPopup <- NULL
+  if(!is.null(popup) && popup){
+    map$options$periodPopup <- TRUE
   }
 
   map$options$periodDuration <- NULL
@@ -428,12 +493,20 @@ map_html <- function(object, directory){
   if(length(object$links)){
     scripts <- c(scripts, "leaflet.curve.js")
   }
+  if(object$options$mode==2){
+    styles <- c(styles, "styles2.css")
+  }else{
+    styles <- c(styles, "styles.css")
+  }
+  scripts <- c(scripts, "jszip.min.js","iro.min.js", language)
+  if(object$options$mode==2){
+    scripts <- c(scripts, "create_map2.js")
+  }else{
+    scripts <- c(scripts, "create_map.js")
+  }
   if(!is.null(object$options$tutorial) && !identical(as.logical(object$options$tutorial),FALSE)){
     scripts <- c(scripts,"tutorial.js",paste0("tutorial_",language))
-    styles <- c(styles,"tutorial.css")
   }
-  styles <- c(styles, "styles.css")
-  scripts <- c(scripts, "jszip.min.js","iro.min.js", language, "create_map.js")
 
   indexfile <- paste0(directory,"/index.html")
   if(file.exists(directory)){
@@ -534,7 +607,16 @@ printTable <- function(x, name){
 }
 
 print.evolMap <- function(x, ...) {
-  printTable(x$markers,"Markers")
+  cat("evolMap object\n")
+  if(!is.null(x$markers)){
+    printTable(x$markers,"Markers")
+  }
+  if(!is.null(x$entities)){
+    printTable(x$entities,"Entities")
+  }
+  if(!is.null(x$links)){
+    printTable(x$links,"Links")
+  }  
 }
 
 plot.evolMap <- function(x, directory = NULL, ...){

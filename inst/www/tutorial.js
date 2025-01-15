@@ -10,6 +10,35 @@ function tutorialTour(options){
     .style("left",(dim.width/4)+"px")
     .style("width",(dim.width/2-panelOffset)+"px")
 
+  var tutorialIcon = body.select("#Wrapper > .topbar").append("div")
+      .attr("class","tutorial-icon")
+      .style("visibility","hidden")
+      .on("click",function(){
+        tutorialIcon.style("visibility","hidden");
+        tutorial = body.select("body > .tutorial");
+        if(tutorial.empty()){
+          tutorial = body.append("div")
+          .attr("class","tutorial")
+          .style("top",60+"px")
+          .style("right",60+"px")
+          .style("width",240+"px")
+          tutorial.append("p").text(tutorial_texts['hello'])
+          tutorial.append("p").text(tutorial_texts['doyouneedhelp'])
+          tutorial
+          .append("button")
+            .attr("class","primary")
+            .style("width","100%")
+            .text(tutorial_texts['seethetutorials'])
+            .on("click",function(){
+              tutorialIcon.remove();
+              tutorialTour(options);
+            })
+          tutorial.append("p")
+        }else{
+          tutorial.remove();
+        }
+      })
+
   var count = 0;
   var steps = [];
 
@@ -51,6 +80,8 @@ function tutorialTour(options){
     .style("width",(dim.width/3-panelOffset)+"px")
 
   steps.push(function(){
+    tutorial.style("top",(dim.height/4)+"px")
+    tutorial.style("left",(dim.width/4)+"px")
     tutorialContent.selectAll("*").remove()
     if(options.tutorial.image){
       tutorialContent.append("img")
@@ -59,23 +90,35 @@ function tutorialTour(options){
     }
     tutorialContent.append("h3").text(tutorial_texts["elementsmap"])
     tutorialContent.append("p").html(tutorial_texts["beforestarting"])
-  });
-
-  steps.push(function(){
-    tutorialContent.selectAll("*").remove()
-    tutorialContent.append("p").html(tutorial_texts["mainpage"])
-    tutorialContent.append("p").html(options.tutorial.description ? options.tutorial.description : tutorial_texts["collectionofelements"])
-    tutorialContent.append("p").html(tutorial_texts['eachfigure'])
-  });
-
-  steps.push(function(){
-    tutorial.style("top",(dim.height/4)+"px")
-    tutorial.style("left",(dim.width/4)+"px")
-    tutorialContent.selectAll("*").remove()
-    tutorialContent.append("p").html(tutorial_texts['hoveringthemouse'])
-    tutorialContent.append("p").html(tutorial_texts['whenclicking'])
     tutorialArrow.style("display","none")
   });
+
+  if(options.tutorial.description){
+    steps.push(function(){
+      tutorial.style("top",(dim.height/4)+"px")
+      tutorial.style("left",(dim.width/4)+"px")
+      tutorialContent.selectAll("*").remove()
+      tutorialContent.append("p").html(tutorial_texts["mainpage"])
+      tutorialContent.append("p").html(options.tutorial.description)
+      tutorialContent.append("p").html(tutorial_texts['eachfigure'])
+      tutorialArrow.style("display","none")
+    });
+  }
+
+  if(options.markerText || options.markerInfo){
+    steps.push(function(){
+      tutorial.style("top",(dim.height/4)+"px")
+      tutorial.style("left",(dim.width/4)+"px")
+      tutorialContent.selectAll("*").remove()
+      if(options.markerText){
+        tutorialContent.append("p").html(tutorial_texts['hoveringthemouse'])
+      }
+      if(options.markerInfo){
+        tutorialContent.append("p").html(tutorial_texts['whenclicking'])
+      }
+      tutorialArrow.style("display","none")
+    });
+  }
 
   var timeNav = body.select(".leaflet-bar.time-control");
   if(!timeNav.empty() && timeNav.node().offsetWidth){
@@ -85,7 +128,7 @@ function tutorialTour(options){
       var timeNavDim = timeNav.node().getBoundingClientRect();
       var tutorialDim = tutorial.node().getBoundingClientRect();
       tutorial.style("top",(timeNavDim.top-tutorialDim.height-50)+"px")
-      tutorial.style("left","60px")
+      tutorial.style("left",(timeNavDim.left)+"px")
 
       tutorialArrow.style("display",null)
         .style("transform","rotate(180deg)")
@@ -112,12 +155,17 @@ function tutorialTour(options){
   var searchBox = body.select(".search-wrapper > .search-box");
   if(!searchBox.empty() && searchBox.node().offsetWidth){
     steps.push(function(){
+      if(options.mode==2){
+        var filterpanel = body.select(".filter-panel-wrapper.collapsible-panel.leaflet-control");
+        if(!filterpanel.empty() && !filterpanel.classed("collapse-panel")){
+          filterpanel.select(".highlight-header > .close-button").node().click();
+        }
+      }
       var searchDim = searchBox.node().getBoundingClientRect();
       tutorial.style("left",Math.max(60,searchDim.left)+"px")
       tutorial.style("top",(searchDim.bottom+30)+"px")
       tutorialContent.selectAll("*").remove()
       tutorialContent.append("p").html(tutorial_texts['tofindaspecificelement'])
-      tutorialContent.append("p").html(tutorial_texts['todomultiplesearches'])
 
       tutorialArrow.style("display",null)
         .style("transform",null)
@@ -146,19 +194,22 @@ function tutorialTour(options){
     });
   }
 
-  var legendsPanel = body.select(".legends-panel");
+  var legendsPanel = body.select(".legends-panel-wrapper > .legends-panel");
+  if(legendsPanel.empty() || !legendsPanel.node().offsetWidth){
+    legendsPanel = body.select(".legends-panel-wrapper > .show-panel-button");
+  }
   if(!legendsPanel.empty() && legendsPanel.node().offsetWidth){
     steps.push(function(){
       var legendDim = legendsPanel.node().getBoundingClientRect();
       tutorialContent.selectAll("*").remove()
-      tutorialContent.append("p").html(tutorial_texts['figurescanalsobefiltered'])
+      tutorialContent.append("p").html(tutorial_texts[options.mode==2 ? 'inthelegend' : 'figurescanalsobefiltered'])
       var tutorialDim = tutorial.node().getBoundingClientRect();
       tutorialArrow.style("display",null)
         .style("transform","rotate(90deg)")
         .style("left",(dim.width-legendDim.width-50)+"px")
-        .style("top",(60)+"px")
+        .style("top",(-30 + legendDim.top + legendDim.height/2)+"px")
       tutorial.style("left",(dim.width-legendDim.width-tutorialDim.width-50)+"px")
-      tutorial.style("top",(60)+"px")
+      tutorial.style("top",(legendDim.top)+"px")
     });
   }
 
@@ -181,7 +232,11 @@ function tutorialTour(options){
         ul.append("li").html('<span>'+tutorial_texts["statisticalgraphs"]+'</span><span><img src="'+b64Icons.chart+'"/></span>')
       }
       ul.append("li").html('<span>'+tutorial_texts["informativetables"]+'</span><span><img src="'+b64Icons.table+'"/></span>')
-      tutorial.style("left",30+"px")
+      if(left<dim.width/2){
+        tutorial.style("left",30+"px")
+      }else{
+        tutorial.style("left",(tutorial.node().getBoundingClientRect().width-30)+"px")
+      }
       tutorial.style("top",(top-tutorial.node().getBoundingClientRect().height-30)+"px")
 
       tutorialArrow.style("display",null)
@@ -191,38 +246,31 @@ function tutorialTour(options){
     });
   }
 
+  // multipages
+  if(options.multipages){
+    steps.push(function(){
+      tutorialContent.selectAll("*").remove();
+      var multigraphDim = body.select("#Wrapper > .topbar > .primary.home").node().getBoundingClientRect();
+      tutorial.style("top",(multigraphDim.bottom+40)+"px")
+      tutorial.style("left",multigraphDim.left+"px")
+      tutorialContent.append("p").html(tutorial_texts['inadditiontothispage'])
+      tutorialContent.append("p").html(tutorial_texts['tonavigatefromonetoanother'])
+
+      tutorialArrow.style("display",null)
+        .style("transform",null)
+        .style("left",(multigraphDim.left+(multigraphDim.width/2))+"px")
+        .style("top",(multigraphDim.bottom+10)+"px")
+      tutorial2.style("display","none")
+    });
+  }
+
   go2step(0);
 
   function tutorial_menu(){
     tutorial.remove();
     tutorial2.remove();
     tutorialArrow.remove();
-    var tutorialIcon = body.select(".buttons-panel").append("div")
-      .attr("class","tutorial-icon")
-      .on("click",function(){
-        tutorialIcon.remove();
-        tutorial = body.select("body > .tutorial");
-        if(tutorial.empty()){
-          tutorial = body.append("div")
-          .attr("class","tutorial")
-          .style("top",60+"px")
-          .style("right",60+"px")
-          .style("width",240+"px")
-          tutorial.append("p").text(tutorial_texts['hello'])
-          tutorial.append("p").text(tutorial_texts['doyouneedhelp'])
-          tutorial
-          .append("button")
-            .attr("class","primary")
-            .style("width","100%")
-            .text(tutorial_texts['seethetutorials'])
-            .on("click",function(){
-              tutorialTour(options);
-            })
-          tutorial.append("p")
-        }else{
-          tutorial.remove();
-        }
-      })
+    tutorialIcon.style("visibility","visible");
   }
 
   function updateButtons(c,l){

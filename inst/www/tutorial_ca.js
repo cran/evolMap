@@ -30,6 +30,9 @@ var tutorial_texts = {
   statisticalgraphs: 'Gràfics estadístics',
   informativetables: 'Taules informatives',
 
+  inadditiontothismainpage: 'A més d&apos;aquesta pàgina principal, hi ha altres pàgines amb informació diferent.',
+  tonavigatefromonetabtoanother: 'Per navegar <span class="highlight">d&apos;una pestanya a una altra</span>, utilitzeu la icona <img src="'+b64Icons.home+'"/> disponible a la part superior esquerra de la pantalla.',
+
   hello: "¡Hola!",
   doyouneedhelp: "¿Necessites ajuda?",
   seethetutorials: "Veure els tutorials",

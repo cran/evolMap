@@ -490,6 +490,9 @@ map_html <- function(object, directory){
     styles <- c(styles, "MarkerCluster.css", "MarkerCluster.Default.css")
     scripts <- c(scripts, "leaflet.markercluster.js")
   }
+  if(length(object$minicharts)){
+    scripts <- c(scripts, "leaflet.minichart.min.js")
+  }
   if(length(object$links)){
     scripts <- c(scripts, "leaflet.curve.js")
   }
@@ -558,6 +561,11 @@ map_html <- function(object, directory){
     data$periods <- DFdecompose(object$periods)
   }
 
+  #minicharts
+  if(length(object$minicharts)){
+    data$minicharts <- DFdecompose(object$minicharts)
+  }
+
   json <- toJSON(data,na='null',auto_unbox=TRUE)
   json <- check_utf8(json)
   con <- file(paste0(directory,"/data.js"), encoding = "UTF-8")
@@ -621,8 +629,12 @@ print.evolMap <- function(x, ...) {
 
 plot.evolMap <- function(x, directory = NULL, ...){
   if(is.null(directory)){
-    directory <- paste0(tempdir(),"/evolMap")
+    directory <- tempfile()
   }
   map_html(x, directory)
-  browseURL(normalizePath(paste(directory, "index.html", sep = "/")))
+  if(interactive()){
+    browseURL(normalizePath(paste(directory, "index.html", sep = "/")))
+  }else{
+    message(paste0("The graph has been generated in the \"",normalizePath(directory),"\" path."))
+  }
 }
